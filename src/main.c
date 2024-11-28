@@ -60,8 +60,10 @@ int main() {
 			switch (header_parse_counter) {
 				case 0:
 					method = header_token;
+					break;
 				case 1:
 					urlRoute = header_token;
+					break;
 			}
 			header_token = strtok(NULL, " ");
 			header_parse_counter++;
@@ -69,6 +71,29 @@ int main() {
 
 		printf("The method is %s\n", method);
 		printf("The route is %s\n", urlRoute);
+
+		if (strcmp(method, "GET") == 0) {
+        // Handle GET request
+        handle_get_request(urlRoute, client_socket);
+		}
+		else if (strcmp(method, "POST") == 0) {
+			// Handle POST request
+			handle_post_request(urlRoute, client_socket, client_msg);
+		}
+		else if (strcmp(method, "PUT") == 0) {
+			// Handle PUT request
+			handle_put_request(urlRoute, client_socket, client_msg);
+		}
+		else if (strcmp(method, "DELETE") == 0) {
+			// Handle DELETE request
+			handle_delete_request(urlRoute, client_socket);
+		}
+		else {
+			// Unsupported method
+			send_error_response(client_socket, 405);  // 405 Method Not Allowed
+		}
+
+		close(client_socket);
 
 		if (strlen(urlRoute) > 0)
 		{

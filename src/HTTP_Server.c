@@ -56,3 +56,73 @@ void http_set_response_body(
 	strncat(http_server->response, body, max_len);
 	strncat(http_server->response, "\r\n\r\n", 5);
 }
+
+void handle_get_request(char * urlRoute, int client_socket) {
+	char template[100] = "";
+
+	struct Route *destination = search(route, urlRoute);
+	strcat(template, "templates/");
+
+	if (destination == NULL) {
+		strcat(template, "404.html");
+		http_set_status_code(&http_server, NOT_FOUND);
+	} else {
+		strcat(template, destination->value);
+		http_set_status_code(&http_server, OK);
+	}
+
+	char *response_data = render_static_file(template);
+	http_set_response_body(&http_server, response_data);
+	send(client_socket, http_server.response, sizeof(http_server.response), 0);
+	free(response_data)
+}
+
+void handle_post_request(char *urlRoute, int client_socket, char *client_msg) {
+    // Parsing data yang dikirimkan oleh klien (misalnya form data)
+    printf("Handling POST request for %s\n", urlRoute);
+
+    // Cek apakah ada parameter atau data yang dikirimkan
+    // Misalnya, kita hanya akan mencetak data yang diterima untuk saat ini
+    printf("POST Data received: %s\n", client_msg);
+
+    // Response sukses
+    http_set_status_code(&http_server, CREATED);
+    const char *body = "POST request processed successfully!";
+    http_set_response_body(&http_server, body);
+    send(client_socket, http_server.response, sizeof(http_server.response), 0);
+}
+
+void handle_put_request(char *urlRoute, int client_socket, char *client_msg) {
+    // Untuk PUT, bisa sama seperti POST, tapi dengan tujuan update data
+    printf("Handling PUT request for %s\n", urlRoute);
+
+    // Misalnya, update data di server
+    printf("PUT Data received: %s\n", client_msg);
+
+    // Response sukses
+    http_set_status_code(&http_server, OK);
+    const char *body = "PUT request processed successfully!";
+    http_set_response_body(&http_server, body);
+    send(client_socket, http_server.response, sizeof(http_server.response), 0);
+}
+
+void handle_delete_request(char *urlRoute, int client_socket) {
+    // Misalnya, kita menghapus file yang diminta oleh klien
+    printf("Handling DELETE request for %s\n", urlRoute);
+
+    // Hapus file atau data terkait dengan URL
+    // Jika berhasil, kirimkan response sukses
+    http_set_status_code(&http_server, OK);
+    const char *body = "DELETE request processed successfully!";
+    http_set_response_body(&http_server, body);
+    send(client_socket, http_server.response, sizeof(http_server.response), 0);
+}
+
+void send_error_response(int client_socket, int status_code) {
+    const char *error_message = "Method Not Allowed";
+    if (status_code == 405) {
+        http_set_status_code(&http_server, 405);
+        http_set_response_body(&http_server, error_message);
+        send(client_socket, http_server.response, sizeof(http_server.response), 0);
+    }
+}
