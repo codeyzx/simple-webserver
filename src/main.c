@@ -171,6 +171,48 @@ int main() {
             header_parse_counter++;
         }
 
+		// if (strlen(urlRoute) > 0)
+		// {
+		// 	paramParse(params, urlRoute);
+
+		// 	printf("*** PARSED PARAMETERS ***\n");
+		// 	for (size_t i = 0; i < params->n_members; ++i)
+		// 	{
+		// 		printf("KEY: %s\n", params->parameters[i].key);
+		// 		printf("VALUE: %s\n\n", params->parameters[i].value);
+		// 	}
+		// 	// do something with parameters and can clear them to re-use for the next
+		// 	// request
+		// 	paramClear(params);
+		// }
+
+
+		// char template[100] = "";
+		
+		// if (strstr(urlRoute, "/static/") != NULL) {
+		// 	//strcat(template, urlRoute+1);
+		// 	strcat(template, "static/index.css");
+		// 	http_set_status_code(&http_server, OK);
+		// }else {
+		// 	struct Route * destination = search(route, urlRoute);
+		// 	strcat(template, "templates/");
+
+		// 	if (destination == NULL) {
+		// 		strcat(template, "404.html");
+		// 		http_set_status_code(&http_server, NOT_FOUND);
+		// 	}else {
+		// 		strcat(template, destination->value);
+		// 		http_set_status_code(&http_server, OK);
+		// 	}
+		// }
+
+		// char * response_data = render_static_file(template);
+		// http_set_response_body(&http_server, response_data);
+
+		// send(client_socket, http_server.response, sizeof(http_server.response), 0);
+		// close(client_socket);
+		// free(response_data);
+
         // Menangani berbagai metode HTTP
         if (strcmp(method, "GET") == 0) {
             handle_get_request(client_socket, route, urlRoute);
