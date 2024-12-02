@@ -24,21 +24,27 @@ enum http_status_code_e
 // defined in HTTP_Server.c
 extern const char _status_code_text[8][50];
 
-typedef struct HTTP_Server {
+typedef struct HTTP_Server
+{
 	int socket;
-	int port;	
+	int port;
 	char status_code[HTTP_STATUS_CODE_LEN];
 	char response[HTTP_RESPONSE_BODY_LEN];
 } HTTP_Server;
 
-void init_server(HTTP_Server* http_server, int port);
+extern void init_server(HTTP_Server *http_server, int port);
+
+int create_tcp_socket();
+
+void bind_socket(int sockfd, int port);
+void start_listening(int sockfd);
 
 void http_set_status_code(
-		HTTP_Server* http_server, 
-		const enum http_status_code_e);
+	HTTP_Server *http_server,
+	const enum http_status_code_e);
 
 void http_set_response_body(
-		HTTP_Server* http_server,
-		const char* body);
+	HTTP_Server *http_server,
+	const char *body);
 
 #endif
