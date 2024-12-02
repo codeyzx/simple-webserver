@@ -23,4 +23,4 @@ This project implements a simple HTTP server in C. It includes functionalities f
 ## Authors
 
 1. Yahya Alfon Sinaga (231524064)
-2. Amadeus (231524059)
+2. Amadeus (231524050)
