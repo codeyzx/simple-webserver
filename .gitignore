@@ -1,5 +1,4 @@
-src/*.o
-*.o
 .cache/
 *swp*
 .vscode
+build/
