@@ -16,7 +16,6 @@ struct Route *initRoute(char *key, char *value)
 
 void inorder(struct Route *root)
 {
-
 	if (root != NULL)
 	{
 		inorder(root->left);

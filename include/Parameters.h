@@ -25,13 +25,13 @@
 
 struct Parameter
 {
-	char* key;
-	char* value;
+	char *key;
+	char *value;
 };
 
 struct ParameterArray
 {
-	struct Parameter * parameters;
+	struct Parameter *parameters;
 	bool is_sorted;
 	size_t n_members;
 	size_t capacity;
@@ -39,38 +39,38 @@ struct ParameterArray
 
 // Initialise array of parameters with capacity.
 // Returns pointer to array on success, NULL on failure
-struct ParameterArray * paramInit(const size_t capacity);
+struct ParameterArray *paramInit(const size_t capacity);
 
 // Parse parameters from a string (e.g., when receiving ROUTE url).
 // Takes an existing Parameter pointer and adds new parameters parsed from string.
 // This will MODIFY the url inplace to remove all the parameter text before it's passed
 // on to render a static template.
 void paramParse(
-		struct ParameterArray * params, 
-		char* url);
+	struct ParameterArray *params,
+	char *url);
 
 // Clear all keys & values and set n_members back to zero.
 // This allows us to reuse the struct for multiple requests.
-void paramClear(struct ParameterArray * params);
+void paramClear(struct ParameterArray *params);
 
 // Add new parameter to parameter array.
 // Returns true on success and false on failure (e.g., memory allocation)
 bool paramAdd(
-		struct ParameterArray * params,
-		const char* key,
-		const char* value);
+	struct ParameterArray *params,
+	const char *key,
+	const char *value);
 
 // Sort parameters by keys ascending. This is primarily used internally
 // but can be used externally if needed for whatever reason.
-void paramSort(struct ParameterArray * params);
+void paramSort(struct ParameterArray *params);
 
 // Return a pointer to a parameter with a given key.
 // Any modifications done will be reflected in parameter array.
-struct Parameter * paramGet(
-		struct ParameterArray * params,
-		const char* key);
+struct Parameter *paramGet(
+	struct ParameterArray *params,
+	const char *key);
 
 // Free all memory consumed by parameters
-void paramFree(struct ParameterArray * params);
+void paramFree(struct ParameterArray *params);
 
 #endif
