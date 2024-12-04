@@ -7,6 +7,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h>
+#include <sys/wait.h>
 
 #include "HTTP_Server.h"
 #include "Routes.h"
