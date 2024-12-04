@@ -9,6 +9,8 @@
 #include <errno.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#include <semaphore.h>
+#include <signal.h>
 
 #include "HTTP_Server.h"
 #include "Routes.h"
@@ -18,14 +20,30 @@
 // Maksimum ukuran buffer untuk menerima data dari klien
 #define BUFFER_SIZE 4096
 
+// Jumlah maksimal proses anak yang aktif
+#define MAX_CHILDREN 100000
+
+// Semaphore untuk mengontrol jumlah proses anak
+sem_t child_semaphore;
+
+// Penanganan sinyal untuk SIGCHLD (membersihkan zombie)
+void handle_sigchld(int sig)
+{
+	while (waitpid(-1, NULL, WNOHANG) > 0)
+		;
+}
+
 // Fungsi untuk validasi input dari klien
-int is_valid_input(const char *input) {
-    for (size_t i = 0; input[i] != '\0'; ++i) {
-        if (!isalnum(input[i]) && input[i] != '/' && input[i] != '.' && input[i] != '-') {
-            return 0; // Jika ada karakter yang tidak valid
-        }
-    }
-    return 1; // Semua karakter valid
+int is_valid_input(const char *input)
+{
+	for (size_t i = 0; input[i] != '\0'; ++i)
+	{
+		if (!isalnum(input[i]) && input[i] != '/' && input[i] != '.' && input[i] != '-')
+		{
+			return 0; // Jika ada karakter yang tidak valid
+		}
+	}
+	return 1; // Semua karakter valid
 }
 
 // Function to handle GET requests
@@ -35,14 +53,15 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 	char template_path[100] = "";
 
 	// Validasi URL
-    if (!is_valid_input(url_route)) {
-        http_set_status_code(&http_server, BAD_REQUEST);
-        http_set_response_body(&http_server, "Invalid URL");
-        send(client_socket, http_server.response, strlen(http_server.response), 0);
-        close(client_socket);
-        return;
-    }
-	
+	if (!is_valid_input(url_route))
+	{
+		http_set_status_code(&http_server, BAD_REQUEST);
+		http_set_response_body(&http_server, "Invalid URL");
+		send(client_socket, http_server.response, strlen(http_server.response), 0);
+		close(client_socket);
+		return;
+	}
+
 	// Check if the request is for a static file
 	if (strstr(url_route, "/static/") != NULL)
 	{
@@ -81,18 +100,47 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 void handle_post_request(int client_socket, char *url_route, char *client_msg)
 {
 	HTTP_Server http_server;
-	struct ParameterArray *params = paramInit(10);
-	paramParse(params, client_msg);
 
-	// Set response status and body
-	http_set_status_code(&http_server, CREATED);
-	http_set_response_body(&http_server, "Resource created successfully");
+	if (strcmp(url_route, "/echo") == 0)
+	{
+		char *json_start = strstr(client_msg, ":") + 3;
+		char *json_end = strstr(json_start, "\"") - 1;
+		char client_msg[256];
+		strncpy(client_msg, json_start, json_end - json_start + 1);
+		client_msg[json_end - json_start + 1] = '\0';
 
-	// Send the response
-	send(client_socket, http_server.response, sizeof(http_server.response), 0);
+		printf("Message from client: %s\n", client_msg);
+
+		// Siapkan respons dengan newline di akhir
+		char response[BUFFER_SIZE];
+		snprintf(response, sizeof(response),
+				 "HTTP/1.1 200 OK\r\n"
+				 "Content-Length: %ld\r\n"
+				 "Content-Type: application/json\r\n"
+				 "\r\n"
+				 "{\"result\": \"%s\"}\n",
+				 strlen(client_msg) + 14 + 1, client_msg);
+
+		// Kirim respons
+		send(client_socket, response, strlen(response), 0);
+	}
+
+	else
+	{
+		struct ParameterArray *params = paramInit(10);
+		paramParse(params, client_msg);
+
+		// Set response status and body for other routes
+		http_set_status_code(&http_server, CREATED);
+		http_set_response_body(&http_server, "Resource created successfully");
+
+		// Send the response
+		send(client_socket, http_server.response, sizeof(http_server.response), 0);
+		paramClear(params);
+		paramFree(params);
+	}
+
 	close(client_socket);
-	paramClear(params);
-	paramFree(params);
 }
 
 // Function to handle PUT requests
@@ -158,93 +206,78 @@ void handle_delete_request(int client_socket, char *client_msg)
 	close(client_socket);
 }
 
-// Function to handle ECHO requests
-void handle_echo_request(int client_socket, char *client_msg)
-{
-	char response[BUFFER_SIZE];
-	snprintf(response, sizeof(response),
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Length: %ld\r\n"
-			"Content-Type: text/plain\r\n"
-			"\r\n"
-			"%s",
-			strlen(client_msg), client_msg);
-
-	// Send the response
-	send(client_socket, response, strlen(response), 0);
-	close(client_socket);
-}
+// Function to handle client connection
 
 // Function to handle client connection
 void handle_client_connection(int client_socket, struct Route *route)
 {
 	char client_msg[BUFFER_SIZE] = "";
 	int bytes_read = read(client_socket, client_msg, BUFFER_SIZE - 1);
-	if (bytes_read < 0) {
+	if (bytes_read < 0)
+	{
 		perror("Failed to read from socket");
 		close(client_socket);
+		sem_post(&child_semaphore);
 		return;
 	}
 	client_msg[bytes_read] = '\0';
 
-	// Parse the HTTP header to get the method and URL
-	char *method = "";
-	char *url_route = "";
-	char *client_http_header = strtok(client_msg, "\n");
-	char *header_token = strtok(client_http_header, " ");
-	int header_parse_counter = 0;
-
-	while (header_token != NULL)
+	// Ambil metode HTTP dan URL
+	char method[16], url_route[256];
+	if (sscanf(client_msg, "%15s %255s", method, url_route) != 2)
 	{
-		if (header_parse_counter == 0)
-		{
-			method = header_token;
-		}
-		else if (header_parse_counter == 1)
-		{
-			url_route = header_token;
-		}
-		header_token = strtok(NULL, " ");
-		header_parse_counter++;
+		fprintf(stderr, "Invalid HTTP request format.\n");
+		close(client_socket);
+		sem_post(&child_semaphore);
+		return;
 	}
 
-	// Handle different HTTP methods
+	// Validasi metode HTTP
 	if (strcmp(method, "GET") == 0)
 	{
 		handle_get_request(client_socket, route, url_route);
 	}
 	else if (strcmp(method, "POST") == 0)
 	{
-		handle_post_request(client_socket, url_route, client_msg);
+		char *json_start = strstr(client_msg, "\r\n\r\n");
+		if (json_start)
+		{
+			json_start += 4; // Lompat "\r\n\r\n" untuk ke payload JSON
+			handle_post_request(client_socket, url_route, json_start);
+		}
 	}
 	else if (strcmp(method, "PUT") == 0)
 	{
-		handle_put_request(client_socket, url_route, client_msg);
+		char *json_start = strstr(client_msg, "\r\n\r\n");
+		if (json_start)
+		{
+			json_start += 4; // Lompat "\r\n\r\n" untuk ke payload JSON
+			handle_put_request(client_socket, url_route, json_start);
+		}
 	}
 	else if (strcmp(method, "DELETE") == 0)
 	{
 		handle_delete_request(client_socket, client_msg);
 	}
-	else if (strcmp(method, "ECHO") == 0)
-	{
-		handle_echo_request(client_socket, client_msg);
-	}
 	else
 	{
-		// If the method is not recognized, return 400
 		HTTP_Server http_server;
 		http_set_status_code(&http_server, BAD_REQUEST);
 		http_set_response_body(&http_server, "Method Not Allowed");
 		send(client_socket, http_server.response, strlen(http_server.response), 0);
-		close(client_socket);
 	}
 
 	close(client_socket);
+	sem_post(&child_semaphore); // Lepaskan semaphore
 }
 
 // Main function to run the server
 int main()
 {
+	signal(SIGCHLD, handle_sigchld); // Tangani proses zombie
+
+	sem_init(&child_semaphore, 0, MAX_CHILDREN); // Inisialisasi semaphore
+
 	HTTP_Server http_server;
 	init_server(&http_server, 6969);
 	int client_socket;
@@ -276,11 +309,14 @@ int main()
 			}
 		}
 
+		sem_wait(&child_semaphore); // Tunggu jika proses anak terlalu banyak
+
 		pid_t pid = fork();
 		if (pid < 0)
 		{
 			perror("Failed to fork");
 			close(client_socket);
+			sem_post(&child_semaphore); // Lepaskan semaphore
 			continue;
 		}
 
@@ -295,10 +331,10 @@ int main()
 		{
 			// Parent process
 			close(client_socket);
-    		waitpid(pid, NULL, WNOHANG);  // Menunggu proses anak untuk keluar
 		}
 	}
 
+	sem_destroy(&child_semaphore); // Hancurkan semaphore
 	return 0;
 }
 
