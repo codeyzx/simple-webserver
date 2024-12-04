@@ -272,6 +272,7 @@ int main()
 		{
 			// Parent process
 			close(client_socket);
+    		waitpid(pid, NULL, WNOHANG);  // Menunggu proses anak untuk keluar
 		}
 	}
 
