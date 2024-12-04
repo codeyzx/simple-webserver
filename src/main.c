@@ -13,12 +13,34 @@
 #include "Response.h"
 #include "Parameters.h"
 
+// Maksimum ukuran buffer untuk menerima data dari klien
+#define BUFFER_SIZE 4096
+
+// Fungsi untuk validasi input dari klien
+int is_valid_input(const char *input) {
+    for (size_t i = 0; input[i] != '\0'; ++i) {
+        if (!isalnum(input[i]) && input[i] != '/' && input[i] != '.' && input[i] != '-') {
+            return 0; // Jika ada karakter yang tidak valid
+        }
+    }
+    return 1; // Semua karakter valid
+}
+
 // Function to handle GET requests
 void handle_get_request(int client_socket, struct Route *route, char *url_route)
 {
 	HTTP_Server http_server;
 	char template_path[100] = "";
 
+	// Validasi URL
+    if (!is_valid_input(url_route)) {
+        http_set_status_code(&http_server, BAD_REQUEST);
+        http_set_response_body(&http_server, "Invalid URL");
+        send(client_socket, http_server.response, strlen(http_server.response), 0);
+        close(client_socket);
+        return;
+    }
+	
 	// Check if the request is for a static file
 	if (strstr(url_route, "/static/") != NULL)
 	{
@@ -137,14 +159,14 @@ void handle_delete_request(int client_socket, char *client_msg)
 // Function to handle ECHO requests
 void handle_echo_request(int client_socket, char *client_msg)
 {
-	char response[4096];
+	char response[BUFFER_SIZE];
 	snprintf(response, sizeof(response),
-			 "HTTP/1.1 200 OK\r\n"
-			 "Content-Length: %ld\r\n"
-			 "Content-Type: text/plain\r\n"
-			 "\r\n"
-			 "%s",
-			 strlen(client_msg), client_msg);
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Length: %ld\r\n"
+			"Content-Type: text/plain\r\n"
+			"\r\n"
+			"%s",
+			strlen(client_msg), client_msg);
 
 	// Send the response
 	send(client_socket, response, strlen(response), 0);
@@ -154,13 +176,12 @@ void handle_echo_request(int client_socket, char *client_msg)
 // Function to handle client connection
 void handle_client_connection(int client_socket, struct Route *route)
 {
-	char client_msg[4096] = "";
-	int bytes_read = read(client_socket, client_msg, 4095);
-	if (bytes_read < 0)
-	{
+	char client_msg[BUFFER_SIZE] = "";
+	int bytes_read = read(client_socket, client_msg, BUFFER_SIZE - 1);
+	if (bytes_read < 0) {
 		perror("Failed to read from socket");
 		close(client_socket);
-		exit(1);
+		return;
 	}
 	client_msg[bytes_read] = '\0';
 
