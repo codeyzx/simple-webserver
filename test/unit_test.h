@@ -6,6 +6,7 @@
 #include "../include/Routes.h"
 #include "../include/Response.h"
 #include "../include/Parameters.h"
+#include "../include/Server.h"
 
 // Deklarasi fungsi unit test
 void test_http_set_status_code(void);
