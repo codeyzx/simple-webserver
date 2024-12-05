@@ -121,9 +121,20 @@ void test_param_parse(void) {
     paramFree(params);
 }
 
-// Main test runner
-// int main(void) {
-//     UNITY_BEGIN();
-//     RUN_TEST(test_handle_get_request);
-//     return UNITY_END();
-// }
+#ifdef TEST_UNIT  // Menandakan bahwa ini adalah kompilasi untuk unit test
+
+int main(void) {
+    UNITY_BEGIN();  // Inisialisasi Unity
+    RUN_TEST(test_http_set_status_code);
+    RUN_TEST(test_http_set_response_body);
+    RUN_TEST(test_handle_get_request);
+    RUN_TEST(test_is_valid_input);
+    RUN_TEST(test_handle_post_request_echo);
+    RUN_TEST(test_handle_post_request_form);
+    RUN_TEST(test_handle_put_request);
+    RUN_TEST(test_handle_delete_request);
+    RUN_TEST(test_param_parse);
+    return UNITY_END();  // Menyelesaikan dan menampilkan hasil
+}
+
+#endif  // TEST_UNIT
