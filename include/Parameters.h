@@ -2,75 +2,52 @@
 #define PARAMETERS_H
 
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
 
-/*
- * Implementation notes: (22 Jan 2023)
- *
- * Parameters will be stored as an array sorted on-demand.
- * If calling paramGet and it's unsorted, it will sort automatically.
- * If calling paramGet and it's already sorted, it doesn't touch it.
- * Adding a new parameter will toggle the is_sorted to false.
- *
- * I was considering using the tree implementation of Route but I think
- * it would make more sense to move the logic into its own data structure
- * that can be used across different components (like Route & Parameter)
- * because otherwise it would be confusing if we had a Route struct inside
- * of a Parameter. For now, I'll use this array structure.
- *
- */
-
+// Parameter structure representing a key-value pair
+// Used to store individual parameters parsed from a URL
 struct Parameter
 {
-	char *key;
-	char *value;
+	char *key;   // Key of the parameter
+	char *value; // Value associated with the key
 };
 
+// ParameterArray structure representing an array of parameters
+// The array can dynamically grow and supports sorting and searching
 struct ParameterArray
 {
-	struct Parameter *parameters;
-	bool is_sorted;
-	size_t n_members;
-	size_t capacity;
+	struct Parameter *parameters; // Array of parameters
+	bool is_sorted;               // Flag indicating if the array is sorted
+	size_t n_members;             // Number of parameters currently in the array
+	size_t capacity;              // Capacity of the array
 };
 
-// Initialise array of parameters with capacity.
-// Returns pointer to array on success, NULL on failure
+// Initialize an array of parameters with the given capacity
+// Returns a pointer to the newly created ParameterArray
 struct ParameterArray *paramInit(const size_t capacity);
 
-// Parse parameters from a string (e.g., when receiving ROUTE url).
-// Takes an existing Parameter pointer and adds new parameters parsed from string.
-// This will MODIFY the url inplace to remove all the parameter text before it's passed
-// on to render a static template.
-void paramParse(
-	struct ParameterArray *params,
-	char *url);
+// Parse parameters from a URL string and add them to the parameter array
+// The URL string is expected to be in the format "key1=value1&key2=value2"
+void paramParse(struct ParameterArray *params, char *url);
 
-// Clear all keys & values and set n_members back to zero.
-// This allows us to reuse the struct for multiple requests.
+// Clear all keys and values in the parameter array
+// The array is reset to its initial state, but its capacity remains unchanged
 void paramClear(struct ParameterArray *params);
 
-// Add new parameter to parameter array.
-// Returns true on success and false on failure (e.g., memory allocation)
-bool paramAdd(
-	struct ParameterArray *params,
-	const char *key,
-	const char *value);
+// Add a new parameter to the parameter array
+// Returns true if the parameter was added successfully, false otherwise
+bool paramAdd(struct ParameterArray *params, const char *key, const char *value);
 
-// Sort parameters by keys ascending. This is primarily used internally
-// but can be used externally if needed for whatever reason.
+// Sort parameters by keys in ascending order
+// The array is sorted in place using a comparison function
 void paramSort(struct ParameterArray *params);
 
-// Return a pointer to a parameter with a given key.
-// Any modifications done will be reflected in parameter array.
-struct Parameter *paramGet(
-	struct ParameterArray *params,
-	const char *key);
+// Return a pointer to a parameter with the given key
+// Returns NULL if the key is not found in the array
+struct Parameter *paramGet(struct ParameterArray *params, const char *key);
 
-// Free all memory consumed by parameters
+// Free all memory consumed by the parameter array
+// The array and all its elements are deallocated
 void paramFree(struct ParameterArray *params);
 
 #endif
