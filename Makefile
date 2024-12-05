@@ -3,9 +3,9 @@ CC=gcc
 # Compiler flags
 CFLAGS=-Iinclude
 # Header file dependencies
-DEPS = HTTP_Server.h
+DEPS = HTTP_Server.h Server.h
 # Name of the generated executable file
-exec = build/server.o
+exec = build/program.exe
 # Source C files in the src directory
 sources = $(wildcard src/*.c)
 # Object files generated in the build directory

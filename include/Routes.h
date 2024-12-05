@@ -1,3 +1,6 @@
+#ifndef ROUTES_H
+#define ROUTES_H
+
 // Route structure representing a node in a binary search tree
 // Each node contains a key-value pair and pointers to the left and right child nodes
 struct Route
@@ -22,3 +25,5 @@ struct Route *search(struct Route *root, char *key);
 // Perform an inorder traversal of the binary search tree
 // The traversal visits nodes in ascending order of their keys
 void inorder(struct Route *root);
+
+#endif // ROUTES_H
