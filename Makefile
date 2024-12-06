@@ -5,7 +5,7 @@ CFLAGS=-Iinclude
 # Header file dependencies
 DEPS = HTTP_Server.h Server.h
 # Name of the generated executable file
-exec = build/program.exe
+exec = build/webserver
 # Source C files in the src directory
 sources = $(wildcard src/*.c)
 # Object files generated in the build directory
