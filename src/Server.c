@@ -82,8 +82,6 @@ void handle_post_request(int client_socket, char *url_route, char *client_msg, c
 		client_msg[json_end - json_start + 1] = '\0'; // Null-terminate the string
 
 		printf("\n\nMessage from client: %s\n", client_msg); // Print the message from the client
-		
-		strcpy(result, client_msg); // Copy the message to the result
 
 		char response[BUFFER_SIZE];
 		snprintf(response, sizeof(response),
@@ -101,6 +99,8 @@ void handle_post_request(int client_socket, char *url_route, char *client_msg, c
 		send(client_socket, http_server.response, sizeof(http_server.response), 0); // Send response
 	}
 
+	strcpy(result, client_msg); // Copy the message to the result
+	
 	close(client_socket); // Close the client socket
 }
 
