@@ -78,7 +78,7 @@ void handle_post_request(int client_socket, char *url_route, char *client_msg) {
 		strncpy(client_msg, json_start, json_end - json_start + 1); // Copy the JSON value
 		client_msg[json_end - json_start + 1] = '\0'; // Null-terminate the string
 
-		printf("Message from client: %s\n", client_msg); // Print the message from the client
+		printf("\n\nMessage from client: %s\n", client_msg); // Print the message from the client
 
 		char response[BUFFER_SIZE];
 		snprintf(response, sizeof(response),
@@ -111,6 +111,10 @@ void handle_put_request(int client_socket, char *url_route, char *client_msg) {
 	HTTP_Server http_server;
 	struct ParameterArray *params = paramInit(10); // Initialize parameter array
 	paramParse(params, client_msg); // Parse the client message
+
+	// Log data yang diterima untuk debugging
+	printf("\n\nReceived PUT request for URL: %s\n", url_route);
+	printf("Data received: %s\n", client_msg);  // Menampilkan data dari client
 
 	http_set_status_code(&http_server, OK); // Set HTTP status to 200 OK
 	http_set_response_body(&http_server, "Resource updated successfully"); // Set response body
