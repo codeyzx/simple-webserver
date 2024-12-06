@@ -25,6 +25,9 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 	HTTP_Server http_server;
 	char template_path[100] = "";
 
+	// Log request URL
+    printf("\n\nHandling GET request for URL: %s\n", url_route);
+
 	// Validate the URL
 	if (!is_valid_input(url_route)) {
 		http_set_status_code(&http_server, BAD_REQUEST); // Set HTTP status to 400 Bad Request
@@ -56,6 +59,8 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 	char *response_data = render_static_file(template_path);
 	http_set_response_body(&http_server, response_data);
 
+	// Log response status code
+    printf("Response sent with status: %s\n", http_server.status_code);
 	send(client_socket, http_server.response, strlen(http_server.response), 0); // Send response
 	close(client_socket); // Close the client socket
 	free(response_data); // Free the allocated memory for response data
