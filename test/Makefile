@@ -8,9 +8,12 @@ SRC = unit_test.c unity/src/unity.c \
       ../src/Parameters.c \
       ../src/Server.c
 
-OBJ = $(SRC:.c=.o)
+OBJ_DIR = build
+OBJ = $(addprefix $(OBJ_DIR)/, $(notdir $(SRC:.c=.o)))
 
-EXEC = unit_test
+EXEC = build/unit_test
+
+VPATH = unity/src:../src
 
 # Menyusun dan menjalankan unit test
 all: $(EXEC)
@@ -18,10 +21,14 @@ all: $(EXEC)
 $(EXEC): $(OBJ)
 	$(CC) -o $(EXEC) $(OBJ)
 
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 run_tests: $(EXEC)
 	./$(EXEC)
 
 clean:
-	rm -f $(OBJ) $(EXEC)
+	rm -rf $(OBJ_DIR) $(EXEC)
 
 .PHONY: all run_tests clean
