@@ -42,7 +42,6 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route,
 	if (strstr(url_route, "/static/") != NULL) {
 		strcat(template_path, "static/index.css"); // Set path to static file
 		http_set_status_code(&http_server, OK); // Set HTTP status to 200 OK
-		strcpy(result, http_server.status_code); // Copy the status code to the result
 	} else {
 		// Search for the route in the routing table
 		struct Route *destination = search(route, url_route);
@@ -51,11 +50,9 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route,
 		if (destination == NULL) {
 			strcat(template_path, "404.html"); // Set path to 404 page
 			http_set_status_code(&http_server, NOT_FOUND); // Set HTTP status to 404 Not Found
-			strcpy(result, http_server.status_code); // Copy the status code to the result
 		} else {
 			strcat(template_path, destination->value); // Set path to the destination file
 			http_set_status_code(&http_server, OK); // Set HTTP status to 200 OK
-			strcpy(result, http_server.status_code); // Copy the status code to the result
 		}
 	}
 
@@ -66,6 +63,8 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route,
 	// Log response status code
     printf("Response sent with status: %s\n", http_server.status_code);
 	send(client_socket, http_server.response, strlen(http_server.response), 0); // Send response
+	strcpy(result, http_server.status_code); // Copy the status code to the result
+
 	close(client_socket); // Close the client socket
 	free(response_data); // Free the allocated memory for response data
 }
