@@ -1,9 +1,106 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Cerveur</title>
-		<link rel="stylesheet" href="../static/index.css" />
-	</head>
-	<body><h1>Index page</h1>
-	</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Home Mewing</title>
+    <style>
+      /* Global Styles */
+      body {
+        margin: 0;
+        font-family: "Arial", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(120deg, #8ec5fc, #e0c3fc);
+        overflow: hidden;
+      }
+
+      /* Container for the welcome message */
+      .welcome-container {
+        text-align: center;
+        color: #fff;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        background: rgba(0, 0, 0, 0.4);
+        max-width: 600px;
+      }
+
+      /* Stylish title */
+      .welcome-title {
+        font-size: 3rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        animation: fadeIn 3s ease-out;
+      }
+
+      /* Subtext below title */
+      .welcome-subtext {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        opacity: 0.8;
+      }
+
+      /* Button styling */
+      .welcome-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #fff;
+        background: #ff7eb3;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      /* Hover effect for button */
+      .welcome-button:hover {
+        background: #ff4d6d;
+        transform: scale(1.1);
+      }
+
+      /* Responsive design for smaller screens */
+      @media (max-width: 600px) {
+        .welcome-title {
+          font-size: 2.5rem;
+        }
+        .welcome-subtext {
+          font-size: 1rem;
+        }
+        .welcome-button {
+          font-size: 0.9rem;
+          padding: 8px 16px;
+        }
+      }
+
+      /* Animation for the title */
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="welcome-container">
+      <div class="welcome-title">Welcome to Home Mewing!</div>
+      <div class="welcome-subtext">
+        Your journey starts here with beauty and health.
+      </div>
+      <a href="#start" class="welcome-button">Get Started</a>
+    </div>
+  </body>
 </html>
