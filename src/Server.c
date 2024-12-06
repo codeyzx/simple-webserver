@@ -21,7 +21,7 @@ int is_valid_input(const char *input) {
 }
 
 // Function to handle GET requests
-void handle_get_request(int client_socket, struct Route *route, char *url_route) {
+void handle_get_request(int client_socket, struct Route *route, char *url_route, char *result) {
 	HTTP_Server http_server;
 	char template_path[100] = "";
 
@@ -33,6 +33,7 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 		http_set_status_code(&http_server, BAD_REQUEST); // Set HTTP status to 400 Bad Request
 		http_set_response_body(&http_server, "Invalid URL"); // Set response body
 		send(client_socket, http_server.response, strlen(http_server.response), 0); // Send response
+		strcpy(result, http_server.status_code); // Copy the status code to the result
 		close(client_socket); // Close the client socket
 		return;
 	}
@@ -41,6 +42,7 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 	if (strstr(url_route, "/static/") != NULL) {
 		strcat(template_path, "static/index.css"); // Set path to static file
 		http_set_status_code(&http_server, OK); // Set HTTP status to 200 OK
+		strcpy(result, http_server.status_code); // Copy the status code to the result
 	} else {
 		// Search for the route in the routing table
 		struct Route *destination = search(route, url_route);
@@ -49,9 +51,11 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 		if (destination == NULL) {
 			strcat(template_path, "404.html"); // Set path to 404 page
 			http_set_status_code(&http_server, NOT_FOUND); // Set HTTP status to 404 Not Found
+			strcpy(result, http_server.status_code); // Copy the status code to the result
 		} else {
 			strcat(template_path, destination->value); // Set path to the destination file
 			http_set_status_code(&http_server, OK); // Set HTTP status to 200 OK
+			strcpy(result, http_server.status_code); // Copy the status code to the result
 		}
 	}
 
@@ -206,7 +210,7 @@ void handle_client_connection(int client_socket, struct Route *route) {
 
 	// Handle the request based on the HTTP method
 	if (strcmp(method, "GET") == 0) {
-		handle_get_request(client_socket, route, url_route); // Handle GET request
+		handle_get_request(client_socket, route, url_route, ""); // Handle GET request
 	} else if (strcmp(method, "POST") == 0) {
 		char *json_start = strstr(client_msg, "\r\n\r\n");
 		if (json_start) {

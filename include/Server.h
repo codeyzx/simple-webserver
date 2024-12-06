@@ -33,7 +33,7 @@ void handle_sigchld(int sig);
 int is_valid_input(const char *input);
 
 // Handle GET request
-void handle_get_request(int client_socket, struct Route *route, char *url_route);
+void handle_get_request(int client_socket, struct Route *route, char *url_route, char *result);
 
 // Handle POST request
 void handle_post_request(int client_socket, char *url_route, char *client_msg, char *result);

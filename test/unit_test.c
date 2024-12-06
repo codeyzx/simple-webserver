@@ -43,13 +43,20 @@ void test_http_set_response_body(void) {
 
 // Unit test for handling GET requests
 void test_handle_get_request(void) {
-    HTTP_Server server;
+    // Mock function to simulate sending response
+    char result[100];
+
+    // Initialize the routing table
     struct Route *route = initRoute("/", "index.html");
+
+    // Add the /about route
     addRoute(&route, "/about", "about.html");
     
-    handle_get_request(0, route, "/about");
-    
-    TEST_ASSERT_EQUAL_STRING("HTTP/1.1 200 OK\r\n\r\n", server.status_code);
+    // handle the GET request
+    handle_get_request(0, route, "/about", result);
+
+    // Check if the response contains the status code
+    TEST_ASSERT_TRUE(strstr(result, "HTTP/1.1 200 OK"));
 }
 
 // Unit test for input validation
@@ -88,13 +95,19 @@ void test_handle_put_request(void) {
 
 // Unit test for DELETE requests
 void test_handle_delete_request(void) {
-    HTTP_Server server;
-    char client_request[] = "DELETE /delete HTTP/1.1\r\n\r\n";
-    
+    // to delete a resource you need to create a new file first then you deleted it, and then check is the file still exists or not
+    FILE *file = fopen("data/test.txt", "w");
+    fclose(file);
+
+    char client_request[] = "DELETE /test.txt HTTP/1.1\r\n\r\n";
+
+
     handle_delete_request(0, client_request);
-    
-    TEST_ASSERT_EQUAL_STRING("HTTP/1.1 200 OK\r\n\r\n", server.status_code);
-    TEST_ASSERT_TRUE(strstr(server.response, "Resource deleted successfully"));
+
+    // Check if the file is deleted
+    file = fopen("data/test.txt", "r");
+    TEST_ASSERT_NULL(file);  // Ensure file no longer exists
+    if (file) fclose(file); // Prevent invalid fclose call
 }
 
 // Unit test for parameter parsing
@@ -119,14 +132,15 @@ void test_param_parse(void) {
 
 int main(void) {
     UNITY_BEGIN();  // Inisialisasi Unity
+    chdir(".."); // Change directory to project root
+
     RUN_TEST(test_http_set_status_code);
     RUN_TEST(test_http_set_response_body);
-    // RUN_TEST(test_handle_get_request);
+    RUN_TEST(test_handle_get_request);
     RUN_TEST(test_is_valid_input);
     RUN_TEST(test_handle_post_request_echo);
-    // RUN_TEST(test_handle_put_request);
-    // RUN_TEST(test_handle_delete_request);
-    // RUN_TEST(test_param_parse);
+    RUN_TEST(test_handle_delete_request);
+    
     return UNITY_END();  // Menyelesaikan dan menampilkan hasil
 }
 
