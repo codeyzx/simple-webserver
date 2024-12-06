@@ -36,7 +36,7 @@ int is_valid_input(const char *input);
 void handle_get_request(int client_socket, struct Route *route, char *url_route);
 
 // Handle POST request
-void handle_post_request(int client_socket, char *url_route, char *client_msg);
+void handle_post_request(int client_socket, char *url_route, char *client_msg, char *result);
 
 // Handle PUT request
 void handle_put_request(int client_socket, char *url_route, char *client_msg);

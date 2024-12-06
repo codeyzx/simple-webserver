@@ -67,7 +67,7 @@ void handle_get_request(int client_socket, struct Route *route, char *url_route)
 }
 
 // Function to handle POST requests
-void handle_post_request(int client_socket, char *url_route, char *client_msg) {
+void handle_post_request(int client_socket, char *url_route, char *client_msg, char *result) {
 	HTTP_Server http_server;
 
 	// Handle the /echo route
@@ -79,6 +79,8 @@ void handle_post_request(int client_socket, char *url_route, char *client_msg) {
 		client_msg[json_end - json_start + 1] = '\0'; // Null-terminate the string
 
 		printf("\n\nMessage from client: %s\n", client_msg); // Print the message from the client
+		
+		strcpy(result, client_msg); // Copy the message to the result
 
 		char response[BUFFER_SIZE];
 		snprintf(response, sizeof(response),
@@ -88,19 +90,12 @@ void handle_post_request(int client_socket, char *url_route, char *client_msg) {
 				 "\r\n"
 				 "{\"result\": \"%s\"}\n",
 				 strlen(client_msg) + 14 + 1, client_msg); // Create the response
-
+		
 		send(client_socket, response, strlen(response), 0); // Send the response
 	} else {
-		// Parse parameters and send a response
-		struct ParameterArray *params = paramInit(10); // Initialize parameter array
-		paramParse(params, client_msg); // Parse the client message
-
-		http_set_status_code(&http_server, CREATED); // Set HTTP status to 201 Created
-		http_set_response_body(&http_server, "Resource created successfully"); // Set response body
-
+		http_set_status_code(&http_server, NOT_FOUND); // Set HTTP status 404 Not Found
+		http_set_response_body(&http_server, "Resource not found"); // Set response body
 		send(client_socket, http_server.response, sizeof(http_server.response), 0); // Send response
-		paramClear(params); // Clear parameters
-		paramFree(params); // Free parameter array
 	}
 
 	close(client_socket); // Close the client socket
@@ -216,7 +211,7 @@ void handle_client_connection(int client_socket, struct Route *route) {
 		char *json_start = strstr(client_msg, "\r\n\r\n");
 		if (json_start) {
 			json_start += 4;
-			handle_post_request(client_socket, url_route, json_start); // Handle POST request
+			handle_post_request(client_socket, url_route, json_start, ""); // Handle POST request
 		}
 	} else if (strcmp(method, "PUT") == 0) {
 		char *json_start = strstr(client_msg, "\r\n\r\n");
