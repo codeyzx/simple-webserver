@@ -108,21 +108,45 @@ void handle_post_request(int client_socket, char *url_route, char *client_msg) {
 
 // Function to handle PUT requests
 void handle_put_request(int client_socket, char *url_route, char *client_msg) {
-	HTTP_Server http_server;
-	struct ParameterArray *params = paramInit(10); // Initialize parameter array
-	paramParse(params, client_msg); // Parse the client message
+    HTTP_Server http_server;
+    char file_path[256];
 
-	// Log data yang diterima untuk debugging
-	printf("\n\nReceived PUT request for URL: %s\n", url_route);
-	printf("Data received: %s\n", client_msg);  // Menampilkan data dari client
+    // Menghapus '/' dari URL dan membangun path file
+    snprintf(file_path, sizeof(file_path), "./data/%s", url_route + 1); // Menghilangkan '/' pertama
 
-	http_set_status_code(&http_server, OK); // Set HTTP status to 200 OK
-	http_set_response_body(&http_server, "Resource updated successfully"); // Set response body
+    // Log data yang diterima untuk debugging
+    printf("\n\nReceived PUT request for URL: %s\n", url_route);
+    printf("Data received: %s\n", client_msg);  // Menampilkan data dari client
+    printf("File path: %s\n", file_path); // Menampilkan path file untuk debugging
 
-	send(client_socket, http_server.response, sizeof(http_server.response), 0); // Send response
-	close(client_socket); // Close the client socket
-	paramClear(params); // Clear parameters
-	paramFree(params); // Free parameter array
+    // Buka file untuk menulis (akan dibuat jika tidak ada)
+    FILE *file = fopen(file_path, "w"); // Membuka file dalam mode tulis (overwrite)
+    if (file == NULL) {
+        // Jika file tidak ditemukan atau gagal dibuka
+        printf("Failed to open file for writing: %s\n", file_path);
+        http_set_status_code(&http_server, NOT_FOUND); // Set HTTP status 404 Not Found
+        http_set_response_body(&http_server, "Failed to update resource"); // Set response body
+        send(client_socket, http_server.response, sizeof(http_server.response), 0); // Send response
+        close(client_socket); // Close the client socket
+        return;
+    }
+
+    // Jika client mengirimkan data dalam format JSON yang valid
+    // Tulis data yang diterima ke dalam file
+    // Format data sebagai JSON jika perlu
+    fprintf(file, "{\n");
+    fprintf(file, "  \"data\": %s\n", client_msg); // Menulis data JSON dari client
+    fprintf(file, "}\n");
+
+    fclose(file); // Tutup file setelah menulis
+
+    // Set HTTP status dan response body untuk mengkonfirmasi update berhasil
+    http_set_status_code(&http_server, OK); // Set HTTP status 200 OK
+    http_set_response_body(&http_server, "Resource updated successfully"); // Set response body
+
+    // Kirim response ke client
+    send(client_socket, http_server.response, sizeof(http_server.response), 0); // Send response
+    close(client_socket); // Close the client socket
 }
 
 // Function to handle DELETE requests
