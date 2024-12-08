@@ -64,7 +64,11 @@ make run_tests
 ```
 
 
-## Authors
+## Program Flow
+![Program Flow](./asset/Alur_Webserver.png)
+
+
+## Authors ✍️
 
 1. Yahya Alfon Sinaga (231524064)
 2. Amadeus (231524050)
