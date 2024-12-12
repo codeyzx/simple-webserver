@@ -1,3 +1,14 @@
+<a name="top"></a>
+[![language](https://img.shields.io/badge/language-C-00599C?style=for-the-badge&logo=c)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![build](https://img.shields.io/github/workflow/status/username/repo/build?style=for-the-badge)](https://github.com/username/repo/actions)
+[![HTTP Server](https://img.shields.io/badge/HTTP%20Server-Active-blue?style=for-the-badge)](https://www.ietf.org/rfc/rfc2616.txt)
+[![TCP/IP](https://img.shields.io/badge/TCP/IP-Supported-lightblue?style=for-the-badge)](https://en.wikipedia.org/wiki/Internet_Protocol_Suite)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgray?style=for-the-badge)](https://en.wikipedia.org/wiki/Linux)
+[![Dependencies](https://img.shields.io/badge/Dependencies-None-4B8B3B?style=for-the-badge)](https://shields.io/)
+[![Azure Deployment](https://img.shields.io/badge/Azure-Deploying-blue?style=for-the-badge&logo=azure)](https://azure.microsoft.com/en-us/)
+[![Unity Testing](https://img.shields.io/badge/Unit%20Testing-Unity-yellow?style=for-the-badge)](https://github.com/ThrowTheSwitch/Unity)
+
+
 # HTTP Server Project 🚀
 
 This project implements a simple HTTP server in C. It includes functionalities for routing, parameter parsing, and serving static files.
@@ -111,3 +122,5 @@ make run_tests
 
 1. Yahya Alfon Sinaga (231524064)
 2. Amadeus (231524050)
+
+[Back to top](#top)
