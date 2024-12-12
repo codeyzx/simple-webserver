@@ -20,6 +20,10 @@ This project implements a simple HTTP server in C. It includes functionalities f
 - [Features 🌟](#features-)
 - [Files 📁](#files-)
 - [Getting Started 🛠️](#getting-started-️)
+    - [Prerequisites ⚙️](#prerequisites-️)
+    - [Installation 💾](#installation-)
+    - [Request Handling 📡](#request-handling-)
+    - [Running Unit Tests 🧪](#running-unit-tests-)
 - [Program Flow 🌀](#program-flow-)
 - [Authors ✍️](#program-flow)
 
@@ -53,11 +57,11 @@ This project implements a simple HTTP server in C. It includes functionalities f
 ## Getting Started 🛠️
 Follow these steps to set up and run the HTTP server on your machine.
 
-### Prerequisites
+### Prerequisites ⚙️
 - Windows Subsystem for Linux (WSL)
 - GCC Compiler
 
-### Installation
+### Installation 💾
 1. Install WSL:
 ```shell
 wsl --install
@@ -104,7 +108,7 @@ curl -X DELETE http://localhost:6969/chicken.txt --output -
 ```
 
 
-### Running Unit Tests
+### Running Unit Tests 🧪
 Unit tests are included to ensure the server functions as expected.
 1. Navigate to the test directory:
 ```shell
