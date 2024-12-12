@@ -1,5 +1,6 @@
 <a name="top"></a>
 [![language](https://img.shields.io/badge/language-C-00599C?style=for-the-badge&logo=c)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![Concurrency](https://img.shields.io/badge/Concurrency-Forking-00FF00?style=for-the-badge&logo=code)](https://en.wikipedia.org/wiki/Fork_(system_call))
 [![Makefile](https://img.shields.io/badge/Makefile-Used-blue?style=for-the-badge&logo=makefile)](https://www.gnu.org/software/make/)
 [![WSL Support](https://img.shields.io/badge/WSL-Supported-blue?style=for-the-badge&logo=windows-subsystem-for-linux)](https://docs.microsoft.com/en-us/windows/wsl/)
 [![HTTP Server](https://img.shields.io/badge/HTTP%20Server-Active-blue?style=for-the-badge)](https://www.ietf.org/rfc/rfc2616.txt)
