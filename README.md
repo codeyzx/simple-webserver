@@ -66,21 +66,25 @@ make
 ### Request Handling 📡
 In this HTTP Server Project, HTTP method testing using curl is performed to send HTTP requests to a running server, to verify that the server can properly handle various types of HTTP requests.
 1. Method GET
+
 Example:
 ```shell
 curl http://localhost:6969/about
 ```
 2. Method POST
+
 Example:
 ```shell
 curl -X POST http://localhost:6969/echo -H "Content-Type: application/json" -d '{"message": "Hello, Server!"}'
 ```
 3. Method PUT
+
 Example:
 ```shell
 curl -X PUT http://localhost:6969/sample.txt -d '{"name": "amadeus", "age": 10}' --output -
 ```
 4. Method DELETE
+
 Example:
 ```shell
 curl -X DELETE http://localhost:6969/chicken.txt --output -
