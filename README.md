@@ -1,6 +1,7 @@
 <a name="top"></a>
 [![language](https://img.shields.io/badge/language-C-00599C?style=for-the-badge&logo=c)](https://en.wikipedia.org/wiki/C_(programming_language))
-[![build](https://img.shields.io/github/workflow/status/username/repo/build?style=for-the-badge)](https://github.com/username/repo/actions)
+[![Makefile](https://img.shields.io/badge/Makefile-Used-blue?style=for-the-badge&logo=makefile)](https://www.gnu.org/software/make/)
+[![WSL Support](https://img.shields.io/badge/WSL-Supported-blue?style=for-the-badge&logo=windows-subsystem-for-linux)](https://docs.microsoft.com/en-us/windows/wsl/)
 [![HTTP Server](https://img.shields.io/badge/HTTP%20Server-Active-blue?style=for-the-badge)](https://www.ietf.org/rfc/rfc2616.txt)
 [![TCP/IP](https://img.shields.io/badge/TCP/IP-Supported-lightblue?style=for-the-badge)](https://en.wikipedia.org/wiki/Internet_Protocol_Suite)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgray?style=for-the-badge)](https://en.wikipedia.org/wiki/Linux)
